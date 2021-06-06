@@ -4,9 +4,7 @@ import { Square } from "./";
 const Board = () => {
   const status = "Next player: X";
 
-  const renderSquare = (i) => {
-    return <Square />;
-  };
+  const renderSquare = (i) => <Square value={i} />;
 
   return (
     <div>
