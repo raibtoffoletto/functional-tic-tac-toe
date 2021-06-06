@@ -1,8 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 
 const Square = ({ value }) => {
-  return <button className="square">{value}</button>;
+  const [thisValue, setThisValue] = useState("");
+
+  return (
+    <button className="square" onClick={() => setThisValue("X")}>
+      {thisValue}
+    </button>
+  );
 };
 
 Square.propTypes = {
