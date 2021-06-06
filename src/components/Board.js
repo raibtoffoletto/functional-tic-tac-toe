@@ -1,10 +1,23 @@
-import React from "react";
+import React, { useReducer } from "react";
 import { Square } from "./";
 
 const Board = () => {
+  const [boardState, setBoardState] = useReducer(
+    (state, action) => ({
+      ...state,
+      [action.square]: action.player,
+    }),
+    { ...Array(9).fill(null) }
+  );
+
   const status = "Next player: X";
 
-  const renderSquare = (i) => <Square value={i} />;
+  const renderSquare = (i) => (
+    <Square
+      handleClick={() => setBoardState({ square: i, player: "X" })}
+      value={boardState[i]}
+    />
+  );
 
   return (
     <div>

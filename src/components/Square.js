@@ -1,18 +1,15 @@
-import React, { useState } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 
-const Square = ({ value }) => {
-  const [thisValue, setThisValue] = useState("");
-
-  return (
-    <button className="square" onClick={() => setThisValue("X")}>
-      {thisValue}
-    </button>
-  );
-};
+const Square = ({ value, handleClick }) => (
+  <button className="square" onClick={handleClick}>
+    {value}
+  </button>
+);
 
 Square.propTypes = {
-  value: PropTypes.number.isRequired,
+  value: PropTypes.string,
+  handleClick: PropTypes.func.isRequired,
 };
 
 export default Square;
