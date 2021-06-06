@@ -72,6 +72,7 @@ const BoardProvider = ({ children }) => {
 
   const hooks = {
     historyIndex,
+    setHistoryIndex,
     boardHistory,
     handleSquareClick,
     boardState: boardHistory[historyIndex],
