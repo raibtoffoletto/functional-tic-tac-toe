@@ -1,7 +1,11 @@
-import React, { useReducer } from "react";
+import React, { useReducer, useState, useMemo } from "react";
 import { Square } from "./";
 
 const Board = () => {
+  const [isXNext, setIsXNext] = useState(true);
+
+  const getNextPlayer = useMemo(() => (!!isXNext ? "X" : "O"), [isXNext]);
+
   const [boardState, setBoardState] = useReducer(
     (state, action) => ({
       ...state,
@@ -10,33 +14,26 @@ const Board = () => {
     { ...Array(9).fill(null) }
   );
 
-  const status = "Next player: X";
-
   const renderSquare = (i) => (
     <Square
-      handleClick={() => setBoardState({ square: i, player: "X" })}
+      handleClick={() => {
+        setBoardState({ square: i, player: getNextPlayer });
+        setIsXNext((x) => !x);
+      }}
       value={boardState[i]}
     />
   );
 
   return (
     <div>
-      <div className="status">{status}</div>
-      <div className="board-row">
-        {renderSquare(0)}
-        {renderSquare(1)}
-        {renderSquare(2)}
-      </div>
-      <div className="board-row">
-        {renderSquare(3)}
-        {renderSquare(4)}
-        {renderSquare(5)}
-      </div>
-      <div className="board-row">
-        {renderSquare(6)}
-        {renderSquare(7)}
-        {renderSquare(8)}
-      </div>
+      <div className="status">{`Next player: ${getNextPlayer}`}</div>
+      {[0, 3, 6].map((row) => (
+        <div className="board-row" key={`row-${row}`}>
+          {renderSquare(0 + row)}
+          {renderSquare(1 + row)}
+          {renderSquare(2 + row)}
+        </div>
+      ))}
     </div>
   );
 };
