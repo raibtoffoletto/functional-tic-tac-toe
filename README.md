@@ -202,7 +202,7 @@ return (
   );
 ```
 
-**No!** Just remember we are not writing HTML here, those are JSX components, so think of them as functions, in JavaScript you cannot have two `returns` inside the same function, one will be ignored. For the cases when you don't want to insert another DOM element in your structure but you need to wrap the returned JSX in something, React provides us with a component called `Fragment`. It will not insert any HTML tag in the final code, but will provide a wrapper function for all of your returned fragments.
+**No!** A returned JSX must have an unique top level component. Remember that we are not writing HTML here, those are JSX components, so think of them as functions, in JavaScript you cannot have two `returns` inside the same function, one will be ignored. For the cases when you don't want to insert another DOM element in your structure but you need to wrap the returned JSX in something, React provides us with a component called `Fragment`. It will not insert any HTML tag in the final code, but will provide a wrapper function for all of your returned fragments.
 
 ```javascript
 return (
@@ -231,7 +231,7 @@ export default Square;
 
 > Note: To insert comments inside a JSX we need to use {/\* \*/}, remember, you are not writing pure HTML, JSX is a JavaScript syntax.
 
-And finally we have our game's `Board` component. Besides rendering the board structure, this functional component has a property that displays a status message and a function that creates a `Square` component. To use javascript inside the returned JSX, we wrap it with curly braces `{}`, in our case `{status}` prints out the property's string and `{renderSquare()}` creates a `<Square />`.
+And finally we have our game's `Board` component. Besides rendering the board structure, this functional component has a property that displays a status message and a function that creates a `Square` component. To use javascript inside the returned JSX, we wrap it with curly brackets `{}`, in our case `{status}` prints out the property's string and `{renderSquare()}` creates a `<Square />`.
 
 We could simply have used `<Square />` instead of a dedicated function `{renderSquare(i)}`. However, you may have noticed that the board is composed by several squares, so, later on, this function will be useful to iterate over the `Square` component, helping us to not repeat ourselves (the [DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself) rule).
 
@@ -273,9 +273,104 @@ export default Board;
 
 > Note: Make a habit of defining properties as `const`, they may change values in different renders, but assure their immutability for the current render. If a property needs its value changed, then use `let` instead of `var` (...[read more](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/let#Block_scope_with_let)).
 
-> Note: Curly braces `{}` only injects JSX or prints out strings, if you try to print out a `object` it will not work. For `bool`s and `array` values you can quickly convert them to strings with literals: `` {`${true || []}`} ``.
+> Note: Curly brackets `{}` only injects JSX or prints out strings, if you try to print out an `object` it will not work. For `bool`s and `array` values you can quickly convert them to strings with literals: `` {`${true || []}`} ``.
 
-# Passing Data Through Props
+# Passing Data Between Components
+
+## Props
+
+In React, data can be easily **passed down** through the component's hierarchy with the use of `props`. Those properties are forwarded from the parent component to the child component using a syntax similar to HTML:
+
+```javascript
+const ParentComponent = () => (
+  <ChildComponent
+    stringProp=""
+    intProp={0}
+    boolProp={true}
+    arrayProp={[0, 1]}
+    objectProp={{ key: "value" }}
+    functionProp={() => {
+      console.log("function");
+    }}
+  />
+);
+```
+
+Those values can be accessed by the `ChildComponent` via an object always passed to React Components called `props`. We can also easily access those properties by deconstructing the desired values already in the function arguments definition, as it is done with `functionProp` in the example below.
+
+```javascript
+const ChildComponent = ({ functionProp, ...props }) => {
+  const { stringProp, intProp, boolProp, arrayProp, objectProp } = props;
+
+  functionProp({ stringProp, intProp, boolProp, arrayProp, objectProp });
+
+  return null;
+};
+```
+
+> Notes:
+> Anything besides a `string` should be passed between curly brackets.
+> You can discontruct just a few props in the function arguments and leave the rest as part of the `props` object (or any other name) by using the spread operator like the example above.
+
+## Passing a Prop
+
+In the `Board.js`, let's alter our method `renderSquare(i)` to forward its `i` value to each of the different `<Square />` components created. To take advantage of the arrow function syntax, we can omit here the curly brackets and `return` statement. We will pass the value of `i` as a prop named `value`.
+
+```javascript
+...
+
+const renderSquare = (i) => <Square value={i} />;
+
+...
+```
+
+Now we can alter our `Square` component to access and display the `value` prop. We can pass a variable called props as an argument (`Square = (props) =>`) and access its property with `props.value`, or simply use the disconstruction syntax as follow:
+
+```javascript
+...
+
+const Square = ({ value }) => {
+  return <button className="square">{value}</button>;
+};
+
+...
+```
+
+Now the board should show each index number in their correspondent squares.
+
+## Type Check
+
+JavaScript is a dynamic and weak typed language. Due to this characteristic, the type of `value` in `<Square />` can easily change in the parent component before being forwarded to the child component. In our case, we are directly injecting the `value` prop as a button label.If, for example, its type changes from a `number` to an `object` it can cause our program to break. One solution for type safety would be to use TypeScript (there are several cons and pros for that... I wont touch those in this tutorial). Another solution is to use a package provided with React called [PropTypes](https://reactjs.org/docs/typechecking-with-proptypes.html).
+
+With PropTypes, we can define what are the expected types of our props and if they are required or not. In the case of a failure, an error message will appear in the console, making debugging our application much easier. Keeping a component's `propTypes` property up-to-date also helps in documenting what exactly a component expects to be provided with, so in the future we can simply look at it to understand how to implement said component. In the example below, `MyComponent` expects an object `textOptions` containing the properties `color` and `fontSize` of types `string` and `number` respectively.
+
+```javascript
+MyComponent.propTypes = {
+  textOptions: PropTypes.shape({
+    color: PropTypes.string.isRequired,
+    fontSize: PropTypes.number.isRequired,
+  }).isRequired,
+};
+```
+
+To use PropTypes, first we need to import it at the top of our file. Now we can add a propType property to `Square` and make sure that we are receiving a `number` as a prop. To be sure we have a label to our button, we will mark it as _required_. If the `value` passed to the component doesn't meet these requirements, an error will show in the console. Here is how the final component looks like:
+
+```javascript
+import React from "react";
+import PropTypes from "prop-types";
+
+const Square = ({ value }) => {
+  return <button className="square">{value}</button>;
+};
+
+Square.propTypes = {
+  value: PropTypes.number.isRequired,
+};
+
+export default Square;
+```
+
+> Note: The property `propTypes` must always be defined **after** we have declared our component.
 
 # Making an Interactive Component
 
