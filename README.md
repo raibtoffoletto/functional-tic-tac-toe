@@ -374,6 +374,46 @@ export default Square;
 
 # Making an Interactive Component
 
+Having a board showing up the index of its squares is not that interesting, so lets change our `<Square />` component to react on user interactions. For now, we will clear the board and make each component show a **"X"** once it is clicked.
+
+To achieve that, we need to store the squares's state (blanck or filled). If we use a simple variable with a function to change its value, like in the next example, React will render nothing at first and won't know when to rerender the component with the changed state after the click, or, even if the component get rerendered the value will always be the initial one (`undefined`).
+
+```javascript
+let state;
+
+const handleClick = () => {
+  state = "X";
+};
+
+return <button onClick={handleClick}>{state}</button>;
+```
+
+Instead, we will let React manage this state by using the hook `useState`. Hooks are function components that let us *tap into* React component's state and life cicle, so we can easily control them. First, we will import `useState` from the `react` package. 
+
+```javascript
+import React, { useState } from "react";
+```
+
+> Note: You can also use all hooks without deconstructing them by using `React.useState()`.
+
+This hook will return us a getter and a setter (in our case, those are a contant and a function). To declare both, we use the array deconstructing syntax: `let [a,b,...]`. Note the use of the `const` in th declaration, that is because the value of `thisValue` can only be changed by using the setter `setThisValue` and our `thisValue` getter is just a reference to the variable state we are declaring. We can define an initial value to this new state by passing it as an argument when invoking the hook, in our case it will be an empty string.
+
+```javascript
+const [thisValue, setThisValue] = useState("");
+```
+
+In order to react to the user's interaction, we will pass a prop called `onClick` with an anonymous function invoking `setThisValue` to change the value of `thisValue` to `X`. When `seThisValue` is called, a rerender of the component will be schedule so the new value can be used/displayed. But be careful, if you call twice `setThisValue` in the same life cycle, only the last value will be used; a rerender will only occour after all `setState` functions were called in the same life cycle. Also, if use pass a `setState` directly to a prop without wrapping it with a function (e.g. `onClick={setState(true)}`), it will cause the component to rerender in a loop; that's because `setState` is being invoked everytime it is being passed as a prop and it will call for a rerender, in the next render will be invoked again when passed as a prop and it will call for a rerender, and so, on...
+
+```javascript
+...
+    <button className="square" onClick={() => setThisValue("X")}>
+      {thisValue}
+    </button>
+...
+```
+
+>Note: `onClick` is a specific JSX prop, it is not to be confused with the html property `onclick`. JSX props are always in camel case by design.
+
 # Lifting State Up
 
 # Taking Turns
