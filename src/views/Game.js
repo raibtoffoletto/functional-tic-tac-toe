@@ -1,7 +1,6 @@
-import React from "react";
-import { Board } from "../components";
+import { Board } from '../components';
 
-const Game = () => {
+function Game() {
   return (
     <div className="game">
       <div className="game-board">
@@ -13,6 +12,6 @@ const Game = () => {
       </div>
     </div>
   );
-};
+}
 
 export default Game;

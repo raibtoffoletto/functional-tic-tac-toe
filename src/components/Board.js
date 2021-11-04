@@ -1,8 +1,7 @@
-import React from "react";
-import { Square } from "./";
+import { Square } from './';
 
-const Board = () => {
-  const status = "Next player: X";
+function Board() {
+  const status = 'Next player: X';
 
   const renderSquare = (i) => {
     return <Square />;
@@ -28,6 +27,6 @@ const Board = () => {
       </div>
     </div>
   );
-};
+}
 
 export default Board;

@@ -1,6 +1,5 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import "./index.css";
-import Game from "./views";
+import { render } from 'react-dom';
+import './index.css';
+import Game from './views';
 
-ReactDOM.render(<Game />, document.getElementById("root"));
+render(<Game />, document.getElementById('root'));
